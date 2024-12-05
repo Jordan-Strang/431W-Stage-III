@@ -77,6 +77,28 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         #A button to add the student information from the entered fields
         add_button = customtkinter.CTkButton(self, text="Add Student", command=lambda: addStudent(student_id_entry, first_name_entry, last_name_entry, major_entry, year_entry, GPA_entry, result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         add_button.grid(row=9, column=0, columnspan=2, padx=10, pady=10)
+
+        ##############################################################################
+
+        #2. Remove a course from the database, lines 83-
+        #Remove Course heading/title
+        remove_title = customtkinter.CTkLabel(self, text="Remove Course", font=("Arial", 20, "bold"))
+        remove_title.grid(row=10, column=0, columnspan=2, padx=10, pady=20)
+
+        #Label for entering the course id
+        course_id_label = customtkinter.CTkLabel(self, text="Enter Course ID to be Removed:", font=("Arial", 12))
+        course_id_label.grid(row=11, column=0, padx=10, pady=5, sticky="w")
+        #Entry field for entering the course id
+        course_id_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 123450 (6 Digits)", font=("Arial", 12))
+        course_id_entry.grid(row=11, column=1, padx=10, pady=5)
+
+        #Label to display if the removal was successful or a failure (with error)
+        remove_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        remove_result_label.grid(row=12, column=0, columnspan=2, padx=10, pady=10)
+
+        #A button to remove the course from the course information
+        remove_button = customtkinter.CTkButton(self, text="Remove Course", command=lambda: removeCourse(course_id_entry, remove_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        remove_button.grid(row=13, column=0, columnspan=2, padx=10, pady=10)
      
 #Sets Up the App appearance
 class App(customtkinter.CTk):
@@ -100,7 +122,7 @@ def addStudent(student_id_entry, first_name_entry, last_name_entry, major_entry,
     year = year_entry.get()
     gpa = GPA_entry.get()
 
-    #Error to handle if one of the fields are empty or NULL. All Entry fields must be filled.
+    #Error to handle if one of the entry fields are empty or NULL. All Entry fields must be filled.
     if not student_id or not first_name or not last_name or not major or not year or not gpa:
         result_label.config(text="All Entry fields are required.")
         return
@@ -131,6 +153,46 @@ def addStudent(student_id_entry, first_name_entry, last_name_entry, major_entry,
         cursor.close()
         db.close()
 
+####################################################
+
+#2. Function to Remove the course from the database
+def removeCourse(course_id_entry, result_label):
+    #Retrieve the user inputted information 
+    course_id = course_id_entry.get()
+
+    #Error to handle if the course id entry field is empty
+    if not course_id:
+        result_label.config(text="Course ID is required.")
+        return
+
+    #Connect to the database and try to remove the course
+    try:
+        db = connect_to_database()
+        cursor = db.cursor()
+
+        #The SQL to delete the course from the coures information
+        cursor.execute("""
+            DELETE FROM courseinformation WHERE CourseID = %s """, (course_id,))
+
+        #Finializes the changest to the database
+        db.commit()
+
+        #If the course was removed return that it was completed
+        if cursor.rowcount > 0:
+            result_label.configure(text=f"Course ID: {course_id} has been removed.")
+        else:
+            #If the course cannot be found
+            result_label.configure(text="Course not found.")
+
+    #If an error occurs when removing the course from the database
+    except mysql.connector.Error as sqlError:
+        #Return the error to the user
+        result_label.config(text=f"Error: {sqlError}")
+
+    #Finally exit the database
+    finally:
+        cursor.close()
+        db.close()
 
 #Runs the App
 app = App()
