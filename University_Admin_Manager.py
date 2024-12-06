@@ -253,17 +253,40 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         #########################################################################################################
 
         #7. Generate a courses report, lines 255-266
-        #Generate the GPA report heading/title
+        #Generate the courses report heading/title
         generate_course_report_title = customtkinter.CTkLabel(self, text="Generate Courses Report", font=("Arial", 20, "bold"))
         generate_course_report_title.grid(row=39, column=0, columnspan=2, padx=10, pady=20)
 
-        #Label to display the output of the GPA report or if an error occurred
+        #Label to display the output of the course report or if an error occurred
         course_report_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
         course_report_result_label.grid(row=40, column=0, columnspan=2, padx=10, pady=10)
 
-        #Button to display the GPA report to the user
+        #Button to display the course report to the user
         generate_course_report_button = customtkinter.CTkButton(self, text="Generate Course Report", command=lambda: generateCourseReport(course_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         generate_course_report_button.grid(row=41, column=0, columnspan=2, padx=10, pady=10)
+
+        ####################################################################################################
+
+        #8. Generate a enrolled courses report, lines 270-288
+        #Generate the enrolled courses report heading/title
+        generate_enroll_course_report_title = customtkinter.CTkLabel(self, text="Generate Enrolled Courses Report", font=("Arial", 20, "bold"))
+        generate_enroll_course_report_title.grid(row=42, column=0, columnspan=2, padx=10, pady=20)
+
+        #Label for entering the course id
+        enroll_course_id_label = customtkinter.CTkLabel(self, text="Enter Course ID:", font=("Arial", 12))
+        enroll_course_id_label.grid(row=43, column=0, padx=10, pady=5)
+        #Entry field to enter the course id
+        enroll_course_id_entry = customtkinter.CTkEntry(self,  placeholder_text="e.g 123450 (6 Digits)", font=("Arial", 12))
+        enroll_course_id_entry.grid(row=43, column=1, padx=10, pady=5)
+
+        #Label to display the output of the enrolled courses report or if an error occured
+        enroll_course_report_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        enroll_course_report_result_label.grid(row=44, column=0, columnspan=2, padx=10, pady=10)
+
+        #A button to do the action of generating the enrolled courses report
+        generate_enroll_course_report_button = customtkinter.CTkButton(self, text="Generate Enrolled Course Report", command=lambda: generateEnrolledCourseReport(enroll_course_id_entry, enroll_course_report_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        generate_enroll_course_report_button.grid(row=45, column=0, columnspan=2, padx=10, pady=10)
+        
      
 #Sets Up the App appearance
 class App(customtkinter.CTk):
@@ -564,6 +587,58 @@ def generateCourseReport(result_label):
     finally:
         cursor.close()
         db.close()
+
+########################################################################################################
+
+#8. Function to generate a report of students enrolled in a specific course
+def generateEnrolledCourseReport(course_id_entry, result_label):
+    #Retrieve the user inputted information 
+    course_id = course_id_entry.get()
+
+    #Error to handle if one of the entry fields are empty or NULL. All Entry fields must be filled.
+    if not course_id:
+        result_label.config(text="Course ID Entry field is required.")
+        return
+
+    #Connect to the database and try to generate the enrolled course report
+    try:
+        db = connect_to_database()
+        cursor = db.cursor()
+
+        #The SQL to generate the enrolled course report
+        cursor.execute("""
+            SELECT s.StudentID, s.StuFirstName, s.StuLastName, c.CourseName, c.CourseCode
+            FROM studentinformation s
+            JOIN studentenrollment se ON s.StudentID = se.StudentID
+            JOIN courseinformation c ON se.CourseID = c.CourseID
+            WHERE c.CourseID = %s """, (course_id,))
+
+        #Retrieve the information for the course report
+        students = cursor.fetchall()
+
+        #Constructs the course report to be shown to the user
+        if students:
+            report = f"Course Enrollment Report for Course ID {course_id}\n"
+            report += "-" * 50 + "\n"
+            for student in students:
+                report += f"Student ID: {student[0]}, Student Name: {student[1]} {student[2]}, Course: {student[3]} {student[4]}\n"
+        #If there are no students in the course return that no students enrolled
+        else:
+            report = f"No students are enrolled in this course, Course ID: {course_id}."
+
+        #Returns the final enrolled course report to the user or that no students are enrolled in that course
+        result_label.configure(text=report)
+
+    #If an error occurs when generating the enrolled course report
+    except mysql.connector.Error as sqlError:
+        #Return the error to the user
+        result_label.configure(text=f"Error: {sqlError}")
+
+    #Finally exit the database
+    finally:
+        cursor.close()
+        db.close()
+
 
 #Runs the App
 app = App()
