@@ -4,7 +4,6 @@ import mysql.connector
 
 #Connect to the locally hosted database
 def connect_to_database():
-    """Function to connect to the database"""
     return mysql.connector.connect(
         host="localhost",
         user="root",
@@ -153,9 +152,24 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         update_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
         update_result_label.grid(row=21, column=0, columnspan=2, padx=10, pady=10)
         
-        #A button to updat the students information in the database
+        #A button to update the students information in the database
         update_button = customtkinter.CTkButton(self, text="Update Student Information", command=lambda: updateStudent(update_student_id_entry, update_first_name_entry, update_last_name_entry, update_major_entry, update_year_entry, update_GPA_entry, update_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         update_button.grid(row=22, column=0, columnspan=2, padx=10, pady=10)
+
+        ####################################################################################
+
+        #4. Generate a GPA report from highest to lowest, lines 162-173
+        #Generate the GPA report heading/title
+        generate_GPA_report_title = customtkinter.CTkLabel(self, text="Generate GPA Report", font=("Arial", 20, "bold"))
+        generate_GPA_report_title.grid(row=23, column=0, columnspan=2, padx=10, pady=20)
+
+        #Label to display the output of the GPA report or if an error occurred
+        GPA_report_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        GPA_report_result_label.grid(row=24, column=0, columnspan=2, padx=10, pady=10)
+
+        #Button to display the GPA report to the user
+        generate_GPA_report_button = customtkinter.CTkButton(self, text="Generate Report", command=lambda: generateGPAReport(GPA_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        generate_GPA_report_button.grid(row=25, column=0, columnspan=2, padx=10, pady=10)
      
 #Sets Up the App appearance
 class App(customtkinter.CTk):
@@ -272,6 +286,8 @@ def updateStudent(student_id_entry, first_name_entry, last_name_entry, major_ent
     try:
         db = connect_to_database()
         cursor = db.cursor()
+
+        #The SQL to update the students information
         cursor.execute("""
             UPDATE studentinformation 
             SET StuFirstName = %s, StuLastName = %s, Major = %s, Year = %s, GPA = %s
@@ -293,6 +309,43 @@ def updateStudent(student_id_entry, first_name_entry, last_name_entry, major_ent
         #Return the error to the user
         result_label.configure(text=f"Error: {sqlError}")
     
+    #Finally exit the database
+    finally:
+        cursor.close()
+        db.close()
+
+####################################################################################
+
+#4. Function to generate a report from high to low GPA's
+def generateGPAReport(result_label):
+    #Connect to the database and try to generate the gpa report
+    try:
+        db = connect_to_database()
+        cursor = db.cursor()
+
+        #The SQL to generate the GPA report from highest to lowest
+        cursor.execute("""
+            SELECT StudentID, StuFirstName, StuLastName, Major, Year, GPA 
+            FROM studentinformation 
+            ORDER BY GPA DESC """)
+
+        #Retrieve the information for the GPA report
+        students = cursor.fetchall()
+
+        #Constructs the GPA report to be shown to the user
+        report = "GPA Report Sorted by Highest to Lowest\n"
+        report += "-" * 50 + "\n"
+        for student in students:
+            report += f"ID: {student[0]}, Name: {student[1]} {student[2]}, Major: {student[3]}, Year: {student[4]}, GPA: {student[5]}\n"
+
+        #Returns the final GPA report to the user
+        result_label.configure(text=report)
+
+    #If an error occurs when generating the GPA report 
+    except mysql.connector.Error as sqlError:
+        #Return the error to the user
+        result_label.configure(text=f"Error: {sqlError}")
+
     #Finally exit the database
     finally:
         cursor.close()
