@@ -81,8 +81,8 @@ class MyFrame(customtkinter.CTkScrollableFrame):
 
         #2. Remove a course from the database, lines 83-101
         #Remove Course heading/title
-        remove_title = customtkinter.CTkLabel(self, text="Remove Course", font=("Arial", 20, "bold"))
-        remove_title.grid(row=10, column=0, columnspan=2, padx=10, pady=20)
+        remove_Course_title = customtkinter.CTkLabel(self, text="Remove Course", font=("Arial", 20, "bold"))
+        remove_Course_title.grid(row=10, column=0, columnspan=2, padx=10, pady=20)
 
         #Label for entering the course id
         course_id_label = customtkinter.CTkLabel(self, text="Enter Course ID to be Removed:", font=("Arial", 12))
@@ -92,12 +92,12 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         course_id_entry.grid(row=11, column=1, padx=10, pady=5)
 
         #Label to display if the removal was successful or a failure (with error)
-        remove_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
-        remove_result_label.grid(row=12, column=0, columnspan=2, padx=10, pady=10)
+        remove_Course_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        remove_Course_result_label.grid(row=12, column=0, columnspan=2, padx=10, pady=10)
 
         #A button to remove the course from the course information
-        remove_button = customtkinter.CTkButton(self, text="Remove Course", command=lambda: removeCourse(course_id_entry, remove_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
-        remove_button.grid(row=13, column=0, columnspan=2, padx=10, pady=10)
+        remove_Course_button = customtkinter.CTkButton(self, text="Remove Course", command=lambda: removeCourse(course_id_entry, remove_Course_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        remove_Course_button.grid(row=13, column=0, columnspan=2, padx=10, pady=10)
 
         ####################################################################################
 
@@ -170,6 +170,29 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         #Button to display the GPA report to the user
         generate_GPA_report_button = customtkinter.CTkButton(self, text="Generate Report", command=lambda: generateGPAReport(GPA_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         generate_GPA_report_button.grid(row=25, column=0, columnspan=2, padx=10, pady=10)
+
+        ######################################################################################
+
+        #5. Delete a student from the database
+        #Remove Student heading/title
+        remove_Student_title = customtkinter.CTkLabel(self, text="Remove Student", font=("Arial", 20, "bold"))
+        remove_Student_title.grid(row=26, column=0, columnspan=2, padx=10, pady=20)
+
+        #Label for entering the student id
+        remove_Student_id_label = customtkinter.CTkLabel(self, text="Enter Student ID to be Removed:", font=("Arial", 12))
+        remove_Student_id_label.grid(row=27, column=0, padx=10, pady=5, sticky="w")
+        #Entry field for entering the student id
+        remove_student_id_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 111110 (6 Digits)", font=("Arial", 12))
+        remove_student_id_entry.grid(row=27, column=1, padx=10, pady=5)
+
+        #Label to display if the removal was successful or a failure (with error)
+        remove_student_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        remove_student_result_label.grid(row=28, column=0, columnspan=2, padx=10, pady=10)
+
+        #A button to remove the course from the course information
+        remove_student_button = customtkinter.CTkButton(self, text="Remove Student", command=lambda: removeStudent(remove_student_id_entry, remove_student_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        remove_student_button.grid(row=29, column=0, columnspan=2, padx=10, pady=10)
+
      
 #Sets Up the App appearance
 class App(customtkinter.CTk):
@@ -345,6 +368,47 @@ def generateGPAReport(result_label):
     except mysql.connector.Error as sqlError:
         #Return the error to the user
         result_label.configure(text=f"Error: {sqlError}")
+
+    #Finally exit the database
+    finally:
+        cursor.close()
+        db.close()
+
+#####################################################################################################
+
+#5. Function to remove a student from the database
+def removeStudent(student_id_entry, result_label):
+    #Retrieve the user inputted information 
+    student_id = student_id_entry.get()
+
+    #Error to handle if the student id entry field is empty
+    if not student_id:
+        result_label.config(text="Student ID is required.")
+        return
+
+    #Connect to the database and try to remove the student
+    try:
+        db = connect_to_database()
+        cursor = db.cursor()
+
+        #The SQL to delete the student from the coures information
+        cursor.execute("""
+            DELETE FROM studentinformation WHERE StudentID = %s """, (student_id,))
+
+        #Finializes the changest to the database
+        db.commit()
+
+        #If the Student was removed return that it was completed
+        if cursor.rowcount > 0:
+            result_label.configure(text=f"Student ID: {student_id} has been removed.")
+        else:
+            #If the student cannot be found
+            result_label.configure(text="Student not found.")
+
+    #If an error occurs when removing the student from the database
+    except mysql.connector.Error as sqlError:
+        #Return the error to the user
+        result_label.config(text=f"Error: {sqlError}")
 
     #Finally exit the database
     finally:
