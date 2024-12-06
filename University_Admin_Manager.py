@@ -80,7 +80,7 @@ class MyFrame(customtkinter.CTkScrollableFrame):
 
         ##############################################################################
 
-        #2. Remove a course from the database, lines 83-
+        #2. Remove a course from the database, lines 83-101
         #Remove Course heading/title
         remove_title = customtkinter.CTkLabel(self, text="Remove Course", font=("Arial", 20, "bold"))
         remove_title.grid(row=10, column=0, columnspan=2, padx=10, pady=20)
@@ -99,6 +99,63 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         #A button to remove the course from the course information
         remove_button = customtkinter.CTkButton(self, text="Remove Course", command=lambda: removeCourse(course_id_entry, remove_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         remove_button.grid(row=13, column=0, columnspan=2, padx=10, pady=10)
+
+        ####################################################################################
+
+        #3. Update a students information in the database, lines 105-158
+        #Update student information heading/title
+        updateStudent_title = customtkinter.CTkLabel(self, text="Update Student Information", font=("Arial", 20, "bold"))
+        updateStudent_title.grid(row=14, column=0, columnspan=2, padx=10, pady=20)
+        
+        #Label for entering the student id
+        update_student_id_label = customtkinter.CTkLabel(self, text="Enter Student ID to Update:", font=("Arial", 12))
+        update_student_id_label.grid(row=15, column=0, padx=10, pady=5, sticky="w")
+        #Entry field to enter the student id
+        update_student_id_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 111110 (6 digits)", font=("Arial", 12))
+        update_student_id_entry.grid(row=15, column=1, padx=10, pady=5)
+        
+        #Label for entering the students first name
+        update_first_name_label = customtkinter.CTkLabel(self, text="Enter New First Name:", font=("Arial", 12))
+        update_first_name_label.grid(row=16, column=0, padx=10, pady=5, sticky="w")
+        #Entry field to enter the students first name
+        update_first_name_entry = customtkinter.CTkEntry(self, placeholder_text="e.g John", font=("Arial", 12))
+        update_first_name_entry.grid(row=16, column=1, padx=10, pady=5)
+        
+        #Label for entering the students last name
+        update_last_name_label = customtkinter.CTkLabel(self, text="Enter New Last Name:", font=("Arial", 12))
+        update_last_name_label.grid(row=17, column=0, padx=10, pady=5, sticky="w")
+        #Entry field to enter the students last name
+        update_last_name_entry = customtkinter.CTkEntry(self, placeholder_text="e.g Doe", font=("Arial", 12))
+        update_last_name_entry.grid(row=17, column=1, padx=10, pady=5)
+
+        #Label for entering the students major
+        update_major_label = customtkinter.CTkLabel(self, text="Enter New Major:", font=("Arial", 12))
+        update_major_label.grid(row=18, column=0, padx=10, pady=5, sticky="w")
+        #Entry field for entering the students major
+        update_major_entry = customtkinter.CTkEntry(self, placeholder_text="e.g CMPSC", font=("Arial", 12))
+        update_major_entry.grid(row=18, column=1, padx=10, pady=5)
+        
+        #Label for entering the students year
+        update_year_label = customtkinter.CTkLabel(self, text="Enter New Year:", font=("Arial", 12))
+        update_year_label.grid(row=19, column=0, padx=10, pady=5, sticky="w")
+        #Entry field to enter the students year
+        update_year_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 1 (1, 2, 3, or 4)", font=("Arial", 12))
+        update_year_entry.grid(row=19, column=1, padx=10, pady=5)
+
+        #Label for entering the student's GPA
+        update_GPA_label = customtkinter.CTkLabel(self, text="Enter New GPA:", font=("Arial", 12))
+        update_GPA_label.grid(row=20, column=0, padx=10, pady=5, sticky="w")
+        #Entry field for entering student's GPA
+        update_GPA_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 3.5", font=("Arial", 12))
+        update_GPA_entry.grid(row=20, column=1, padx=10, pady=5)
+        
+        #Lable to display if updating the students information was successful or a failure (with error)
+        update_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        update_result_label.grid(row=21, column=0, columnspan=2, padx=10, pady=10)
+        
+        #A button to updat the students information in the database
+        update_button = customtkinter.CTkButton(self, text="Update Student Information", command=lambda: updateStudent(update_student_id_entry, update_first_name_entry, update_last_name_entry, update_major_entry, update_year_entry, update_GPA_entry, update_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        update_button.grid(row=22, column=0, columnspan=2, padx=10, pady=10)
      
 #Sets Up the App appearance
 class App(customtkinter.CTk):
@@ -153,7 +210,7 @@ def addStudent(student_id_entry, first_name_entry, last_name_entry, major_entry,
         cursor.close()
         db.close()
 
-####################################################
+########################################################################
 
 #2. Function to Remove the course from the database
 def removeCourse(course_id_entry, result_label):
@@ -189,6 +246,53 @@ def removeCourse(course_id_entry, result_label):
         #Return the error to the user
         result_label.config(text=f"Error: {sqlError}")
 
+    #Finally exit the database
+    finally:
+        cursor.close()
+        db.close()
+
+#######################################################################
+
+#3. Function to update the students information
+def updateStudent(student_id_entry, first_name_entry, last_name_entry, major_entry, year_entry, GPA_entry, result_label):
+    #Retrieve the user inputted information
+    student_id = student_id_entry.get()
+    first_name = first_name_entry.get()
+    last_name = last_name_entry.get()
+    major = major_entry.get()
+    year = year_entry.get()
+    gpa = GPA_entry.get()
+
+    #Error to handle if one of the entry fields are empty or NULL. All Entry fields must be filled.
+    if not student_id or not first_name or not last_name or not major or not year or not gpa:
+        result_label.config(text="All Entry fields are required.")
+        return
+
+    #Connect to the database and try to update the student information
+    try:
+        db = connect_to_database()
+        cursor = db.cursor()
+        cursor.execute("""
+            UPDATE studentinformation 
+            SET StuFirstName = %s, StuLastName = %s, Major = %s, Year = %s, GPA = %s
+            WHERE StudentID = %s """, (first_name, last_name, major, year, gpa, student_id))
+
+        #Finializes the changest to the database
+        db.commit()
+
+        #If the student ID does not exist in the database return that no student was found
+        if cursor.rowcount == 0:
+            result_label.configure(text="No student found with that ID.")
+        
+        #Return that the student information has been updated
+        else:
+            result_label.configure(text=f"{first_name} {last_name} with Student ID: {student_id} has been updated.")
+    
+    #If an error occurs when updating student information
+    except mysql.connector.Error as sqlError:
+        #Return the error to the user
+        result_label.configure(text=f"Error: {sqlError}")
+    
     #Finally exit the database
     finally:
         cursor.close()
