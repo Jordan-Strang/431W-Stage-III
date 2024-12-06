@@ -70,12 +70,12 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         GPA_entry.grid(row=7, column=1, padx=10, pady=5)
 
         #Label to display if the entry was succesful or a failure (with error)
-        result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
-        result_label.grid(row=8, column=0, columnspan=2, padx=10, pady=10)
+        add_student_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        add_student_result_label.grid(row=8, column=0, columnspan=2, padx=10, pady=10)
 
         #A button to add the student information from the entered fields
-        add_button = customtkinter.CTkButton(self, text="Add Student", command=lambda: addStudent(student_id_entry, first_name_entry, last_name_entry, major_entry, year_entry, GPA_entry, result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
-        add_button.grid(row=9, column=0, columnspan=2, padx=10, pady=10)
+        add_student_button = customtkinter.CTkButton(self, text="Add Student", command=lambda: addStudent(student_id_entry, first_name_entry, last_name_entry, major_entry, year_entry, GPA_entry, add_student_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        add_student_button.grid(row=9, column=0, columnspan=2, padx=10, pady=10)
 
         ##############################################################################
 
@@ -173,7 +173,7 @@ class MyFrame(customtkinter.CTkScrollableFrame):
 
         ######################################################################################
 
-        #5. Delete a student from the database
+        #5. Delete a student from the database, lines 176-194
         #Remove Student heading/title
         remove_Student_title = customtkinter.CTkLabel(self, text="Remove Student", font=("Arial", 20, "bold"))
         remove_Student_title.grid(row=26, column=0, columnspan=2, padx=10, pady=20)
@@ -192,6 +192,63 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         #A button to remove the course from the course information
         remove_student_button = customtkinter.CTkButton(self, text="Remove Student", command=lambda: removeStudent(remove_student_id_entry, remove_student_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         remove_student_button.grid(row=29, column=0, columnspan=2, padx=10, pady=10)
+
+        ##################################################################################################
+
+        #6. Add a course to the database, lines 198-251
+        #Add Student Heading/Title
+        addCourse_title = customtkinter.CTkLabel(self, text="Insert Course Information", font=("Arial", 20, "bold"))
+        addCourse_title.grid(row=30, column=0, columnspan=2, padx=10, pady=20)
+
+        #Label for entering course id
+        course_id_label = customtkinter.CTkLabel(self, text="Enter Course ID:", font=("Arial", 12))
+        course_id_label.grid(row=31, column=0, padx=10, pady=5, sticky="w")
+        #Entry field to enter the course id
+        course_id_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 123450 (6 digits)", font=("Arial", 12))
+        course_id_entry.grid(row=31, column=1, padx=10, pady=5)
+
+        #Label for entering course  name
+        course_name_label = customtkinter.CTkLabel(self, text="Enter Course Name:", font=("Arial", 12))
+        course_name_label.grid(row=32, column=0, padx=10, pady=5, sticky="w")
+        #Entry field to enter the course name
+        course_name_entry = customtkinter.CTkEntry(self, placeholder_text="e.g CMPSC", font=("Arial", 12))
+        course_name_entry.grid(row=32, column=1, padx=10, pady=5)
+
+        #Label for entering course code
+        course_code_label = customtkinter.CTkLabel(self, text="Enter course code:", font=("Arial", 12))
+        course_code_label.grid(row=33, column=0, padx=10, pady=5, sticky="w")
+        #Entry field to enter the course code
+        course_code_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 464", font=("Arial", 12))
+        course_code_entry.grid(row=33, column=1, padx=10, pady=5)
+
+        #Label for entering the department id
+        department_id_label = customtkinter.CTkLabel(self, text="Enter Department ID:", font=("Arial", 12))
+        department_id_label.grid(row=34, column=0, padx=10, pady=5, sticky="w")
+        #Entry field to enter the department id
+        department_id_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 1210 (4 Digits)", font=("Arial", 12))
+        department_id_entry.grid(row=34, column=1, padx=10, pady=5)
+
+        #Label for entering the credit hours
+        credit_hours_label = customtkinter.CTkLabel(self, text="Enter Credit Hours:", font=("Arial", 12))
+        credit_hours_label.grid(row=35, column=0, padx=10, pady=5, sticky="w")
+        #Entry field for entering the credit hours
+        credit_hours_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 1 (1, 2, 3, or 4)", font=("Arial", 12))
+        credit_hours_entry.grid(row=35, column=1, padx=10, pady=5)
+
+        #Label for entering the instructor id
+        instructor_id_label = customtkinter.CTkLabel(self, text="Enter Instructor ID:", font=("Arial", 12))
+        instructor_id_label.grid(row=36, column=0, padx=10, pady=5, sticky="w")
+        #Entry field for entering the instructor id
+        instructor_id_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 21310 (5 Digits)", font=("Arial", 12))
+        instructor_id_entry.grid(row=36, column=1, padx=10, pady=5)
+
+        #Label to display if the entry was succesful or a failure (with error)
+        add_course_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        add_course_result_label.grid(row=37, column=0, columnspan=2, padx=10, pady=10)
+
+        #A button to add the student information from the entered fields
+        add_course_button = customtkinter.CTkButton(self, text="Add Course", command=lambda: addCourse(course_id_entry, course_name_entry, course_code_entry, department_id_entry, credit_hours_entry, instructor_id_entry, add_course_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        add_course_button.grid(row=38, column=0, columnspan=2, padx=10, pady=10)
 
      
 #Sets Up the App appearance
@@ -410,6 +467,49 @@ def removeStudent(student_id_entry, result_label):
         #Return the error to the user
         result_label.config(text=f"Error: {sqlError}")
 
+    #Finally exit the database
+    finally:
+        cursor.close()
+        db.close()
+
+##################################################################################################
+
+#6. Function to Add a course to the database
+def addCourse(course_id_entry, course_name_entry, course_code_entry, department_id_entry, credit_hours_entry, instructor_id_entry, result_label):
+    #Retrieve the user inputted information 
+    course_id = course_id_entry.get()
+    course_name = course_name_entry.get()
+    course_code = course_code_entry.get()
+    department_id = department_id_entry.get()
+    credit_hours = credit_hours_entry.get()
+    instructor_id = instructor_id_entry.get()
+
+    #Error to handle if one of the entry fields are empty or NULL. All Entry fields must be filled.
+    if not course_id or not course_name or not course_code or not department_id:
+        result_label.config(text="All Entry fields are required.")
+        return
+
+    #Connect to the database and try to add the course
+    try:
+        db = connect_to_database()
+        cursor = db.cursor()
+
+        #The SQL to insert the student into the database
+        cursor.execute(""" 
+            INSERT INTO courseinformation (CourseID, CourseName, CourseCode, DepartmentID, CreditHours, InstructorID) 
+            VALUES (%s, %s, %s, %s, %s, %s)""", (course_id, course_name, course_code, department_id, credit_hours, instructor_id))
+
+        #Finializes the changes to the database
+        db.commit()
+
+        #Returns that it was complete, with the course name, code, and id
+        result_label.configure(text=f"Course: {course_name} {course_code} with Course ID: {course_id} has been added.")
+    
+    #If an error occurs when entering the course information into the database
+    except mysql.connector.Error as sqlError:
+        #Return the error to the user
+        result_label.configure(text=f"Error: {sqlError}")
+    
     #Finally exit the database
     finally:
         cursor.close()
