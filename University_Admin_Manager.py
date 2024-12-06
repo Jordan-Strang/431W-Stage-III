@@ -168,7 +168,7 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         GPA_report_result_label.grid(row=24, column=0, columnspan=2, padx=10, pady=10)
 
         #Button to display the GPA report to the user
-        generate_GPA_report_button = customtkinter.CTkButton(self, text="Generate Report", command=lambda: generateGPAReport(GPA_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        generate_GPA_report_button = customtkinter.CTkButton(self, text="Generate GPA Report", command=lambda: generateGPAReport(GPA_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         generate_GPA_report_button.grid(row=25, column=0, columnspan=2, padx=10, pady=10)
 
         ######################################################################################
@@ -250,6 +250,20 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         add_course_button = customtkinter.CTkButton(self, text="Add Course", command=lambda: addCourse(course_id_entry, course_name_entry, course_code_entry, department_id_entry, credit_hours_entry, instructor_id_entry, add_course_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         add_course_button.grid(row=38, column=0, columnspan=2, padx=10, pady=10)
 
+        #########################################################################################################
+
+        #7. Generate a courses report, lines 255-266
+        #Generate the GPA report heading/title
+        generate_course_report_title = customtkinter.CTkLabel(self, text="Generate Courses Report", font=("Arial", 20, "bold"))
+        generate_course_report_title.grid(row=39, column=0, columnspan=2, padx=10, pady=20)
+
+        #Label to display the output of the GPA report or if an error occurred
+        course_report_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        course_report_result_label.grid(row=40, column=0, columnspan=2, padx=10, pady=10)
+
+        #Button to display the GPA report to the user
+        generate_course_report_button = customtkinter.CTkButton(self, text="Generate Course Report", command=lambda: generateCourseReport(course_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        generate_course_report_button.grid(row=41, column=0, columnspan=2, padx=10, pady=10)
      
 #Sets Up the App appearance
 class App(customtkinter.CTk):
@@ -510,6 +524,42 @@ def addCourse(course_id_entry, course_name_entry, course_code_entry, department_
         #Return the error to the user
         result_label.configure(text=f"Error: {sqlError}")
     
+    #Finally exit the database
+    finally:
+        cursor.close()
+        db.close()
+        
+###################################################################################################################
+
+#7. Function to generate a courses report
+def generateCourseReport(result_label):
+    #Connect to the database and try to generate the course report
+    try:
+        db = connect_to_database()
+        cursor = db.cursor()
+
+        #The SQL to generate the course report
+        cursor.execute("""
+            SELECT CourseName, CourseCode, CreditHours
+            FROM courseinformation """)
+
+        #Retrieve the information for the course report
+        courses = cursor.fetchall()
+
+        #Constructs the course report to be shown to the user
+        report = "Course Report\n"
+        report += "-" * 50 + "\n"
+        for course in courses:
+            report += f"Course Name: {course[0]} {course[1]}, Credit Hours: {course[2]}\n"
+
+        #Returns the final course report to the user
+        result_label.configure(text=report)
+
+    #If an error occurs when generating the course report 
+    except mysql.connector.Error as sqlError:
+        #Return the error to the user
+        result_label.configure(text=f"Error: {sqlError}")
+
     #Finally exit the database
     finally:
         cursor.close()
