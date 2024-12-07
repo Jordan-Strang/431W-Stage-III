@@ -324,6 +324,21 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         generate_housing_report_button = customtkinter.CTkButton(self, text="Generate Housing Status Report", command=lambda: generateHousingStatusReport(housing_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         generate_housing_report_button.grid(row=52, column=0, columnspan=2, padx=10, pady=10)
 
+        #########################################################################################################################
+
+        #11. Generate a students financial information report, lines 329-340
+        #Generate the students financial information report heading/title
+        generate_financial_report_title = customtkinter.CTkLabel(self, text="Generate Students Financial Information Report", font=("Arial", 20, "bold"))
+        generate_financial_report_title.grid(row=50, column=0, columnspan=2, padx=10, pady=20)
+
+        #Label to display the output of the students financial information report or if an error occurred
+        financial_report_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        financial_report_result_label.grid(row=51, column=0, columnspan=2, padx=10, pady=10)
+
+        #Button to display the students financial information report to the user
+        generate_financial_report_button = customtkinter.CTkButton(self, text="Generate Students Financial Information Report", command=lambda: generateFinancialInfoReport(financial_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        generate_financial_report_button.grid(row=52, column=0, columnspan=2, padx=10, pady=10)
+
 #Sets Up the App appearance
 class App(customtkinter.CTk):
     def __init__(self):
@@ -782,7 +797,7 @@ def generateHousingStatusReport(result_label):
         #Retrieve the information for the housing status report
         HousingStatus = cursor.fetchall()
 
-        #Constructs the course report to be shown to the user
+        #Constructs the housing status report to be shown to the user
         report = "Housing Status Report\n"
         report += "-" * 50 + "\n"
 
@@ -791,10 +806,57 @@ def generateHousingStatusReport(result_label):
             student_id, first_name, last_name, year, housing_status, building = housStatus
             report += f"Student ID: {student_id}, Student Name: {first_name} {last_name}, Year: {year}, Housing Status: {housing_status}, Building: {building}\n"
         
-        #Returns the final housing report to the user
+        #Returns the final housing status report to the user
         result_label.configure(text=report)
 
     #If an error occurs when generating the housing status report 
+    except mysql.connector.Error as sqlError:
+        #Return the error to the user
+        result_label.configure(text=f"Error: {sqlError}")
+
+    #Finally exit the database
+    finally:
+        cursor.close()
+        db.close()
+
+#####################################################################################################################
+
+#11. Function to generate a report on all students financial information
+def generateFinancialInfoReport(result_label):
+    #Connect to the database and try to generate the student financial information report
+    try:
+        db = connect_to_database()
+        cursor = db.cursor()
+
+        #The SQL to generate the students financial information report
+        cursor.execute("""
+            SELECT 
+                s.StudentID, 
+                s.StuFirstName, 
+                s.StuLastName, 
+                s.Year, 
+                f.PaymentStatus, 
+                f.AmountDue 
+            FROM studentinformation s 
+            LEFT JOIN financialaid f ON s.StudentID = f.StudentID 
+            ORDER BY s.StudentID """)
+
+        #Retrieve the information for the students financial information report
+        FinancialInfo = cursor.fetchall()
+
+        #Constructs the students financial information report to be shown to the user
+        report = "Student Financial Information Report\n"
+        report += "-" * 50 + "\n"
+
+        #Constructs the students financial information report to be shown to the user
+        for finanInfo in FinancialInfo:
+            student_id, first_name, last_name, year, payment_status, amount_due = finanInfo
+            report += f"Student ID: {student_id}, Student Name: {first_name} {last_name}, Year: {year}, Payment Status: {payment_status}, Amount Due: ${amount_due}\n"
+        
+        #Returns the final students financial information report to the user
+        result_label.configure(text=report)
+
+    #If an error occurs when generating the students financial information report 
     except mysql.connector.Error as sqlError:
         #Return the error to the user
         result_label.configure(text=f"Error: {sqlError}")
