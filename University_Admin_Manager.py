@@ -287,7 +287,28 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         generate_enroll_course_report_button = customtkinter.CTkButton(self, text="Generate Enrolled Course Report", command=lambda: generateEnrolledCourseReport(enroll_course_id_entry, enroll_course_report_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         generate_enroll_course_report_button.grid(row=45, column=0, columnspan=2, padx=10, pady=10)
         
-     
+     #################################################################################################################
+
+        #9. Generate a specific student information report 
+        #Generate the student information report heading/title
+        generate_student_information_report_title = customtkinter.CTkLabel(self, text="Generate Student Information Report", font=("Arial", 20, "bold"))
+        generate_student_information_report_title.grid(row=46, column=0, columnspan=2, padx=10, pady=20)
+
+        #Label for entering the student id
+        information_student_id_label = customtkinter.CTkLabel(self, text="Enter Student ID:", font=("Arial", 12))
+        information_student_id_label.grid(row=47, column=0, padx=10, pady=5)
+        #Entry field to enter the student id
+        information_student_id_entry = customtkinter.CTkEntry(self,  placeholder_text="e.g 111110 (6 Digits)", font=("Arial", 12))
+        information_student_id_entry.grid(row=47, column=1, padx=10, pady=5)
+
+        #Label to display the output of the student informatiom report or if an error occured
+        student_information_report_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        student_information_report_result_label.grid(row=48, column=0, columnspan=2, padx=10, pady=10)
+
+        #A button to do the action of generating the student information report
+        generate_student_information_report_button = customtkinter.CTkButton(self, text="Generate Student Information Report", command=lambda: generateStudentInformationReport(information_student_id_entry, student_information_report_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        generate_student_information_report_button.grid(row=49, column=0, columnspan=2, padx=10, pady=10)
+
 #Sets Up the App appearance
 class App(customtkinter.CTk):
     def __init__(self):
@@ -639,6 +660,87 @@ def generateEnrolledCourseReport(course_id_entry, result_label):
         cursor.close()
         db.close()
 
+##############################################################################################################
+
+#9. Function to generate a report of a specific students information
+def generateStudentInformationReport(student_id_entry, result_label):
+    #Retrieve the user inputted information 
+    student_id = student_id_entry.get()
+
+    #Error to handle if one of the entry fields are empty or NULL. All Entry fields must be filled.
+    if not student_id:
+        result_label.config(text="Student ID Entry field is required.")
+        return
+
+    #Connect to the database and try to generate the enrolled course report
+    try:
+        db = connect_to_database()
+        cursor = db.cursor()
+
+        #The SQL to generate the enrolled course report
+        cursor.execute("""
+            SELECT 
+                s.StudentID, 
+                s.StuFirstName, 
+                s.StuLastName, 
+                s.Major, 
+                s.Year, 
+                s.GPA, 
+                h.HousingStatus, 
+                h.Building, 
+                f.PaymentStatus, 
+                f.AmountDue, 
+                c.PhoneNumber, 
+                c.EmailAddress, 
+                GROUP_CONCAT(DISTINCT co.CourseName ORDER BY co.CourseID) AS EnrolledCourses, 
+                GROUP_CONCAT(DISTINCT co.CourseCode ORDER BY co.CourseID) AS CourseCodes 
+            FROM 
+                studentinformation s 
+            LEFT JOIN 
+                housingstatus h ON s.StudentID = h.StudentID 
+            LEFT JOIN 
+                financialaid f ON s.StudentID = f.StudentID 
+            LEFT JOIN 
+                studentcontact c ON s.StudentID = c.StudentID 
+            LEFT JOIN 
+            studentenrollment se ON s.StudentID = se.StudentID 
+            LEFT JOIN 
+                courseinformation co ON se.CourseID = co.CourseID 
+            WHERE s.StudentID = %s
+            GROUP BY s.StudentID, s.StuFirstName, s.StuLastName, s.Major, s.Year, s.GPA, h.HousingStatus, 
+            h.Building, f.PaymentStatus, f.AmountDue, c.PhoneNumber, c.EmailAddress """, (student_id,))
+
+        #Retrieve the information for the student information report
+        students = cursor.fetchone()
+
+        #Constructs the student information report to be shown to the user
+        if students:
+            report = f"Student Information Report for Student ID {student_id}\n"
+            report += "-" * 50 + "\n"
+            report += f"Student Name: {students[1]} {students[2]}\n"
+            report += f"Major: {students[3]}, Year: {students[4]}, GPA: {students[5]}\n"
+            report += f"Housing Status: {students[6]} - {students[7]}\n"
+            report += f"Payment Status: {students[8]}, Amount Due: ${students[9]:.2f}\n"
+            report += f"Contact Information: {students[10]}, {students[11]}\n"
+            report += f"Enrolled Courses: {students[12] if students[12] else 'No courses enrolled'}\n"
+            report += f"Course Codes: {students[13] if students[13] else 'No courses enrolled'}\n"
+
+        #If there are no students with that student id
+        else:
+            report = f"There exists no Student by Student ID: {student_id}."
+
+        #Returns the final student information report to the user or that no such student exists
+        result_label.configure(text=report)
+
+    #If an error occurs when generating the student information report
+    except mysql.connector.Error as sqlError:
+        #Return the error to the user
+        result_label.configure(text=f"Error: {sqlError}")
+
+    #Finally exit the database
+    finally:
+        cursor.close()
+        db.close()
 
 #Runs the App
 app = App()
