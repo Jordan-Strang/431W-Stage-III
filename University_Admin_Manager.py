@@ -287,9 +287,9 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         generate_enroll_course_report_button = customtkinter.CTkButton(self, text="Generate Enrolled Course Report", command=lambda: generateEnrolledCourseReport(enroll_course_id_entry, enroll_course_report_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         generate_enroll_course_report_button.grid(row=45, column=0, columnspan=2, padx=10, pady=10)
         
-     #################################################################################################################
+        #################################################################################################################
 
-        #9. Generate a specific student information report 
+        #9. Generate a specific student information report, lines 292-310
         #Generate the student information report heading/title
         generate_student_information_report_title = customtkinter.CTkLabel(self, text="Generate Student Information Report", font=("Arial", 20, "bold"))
         generate_student_information_report_title.grid(row=46, column=0, columnspan=2, padx=10, pady=20)
@@ -308,6 +308,21 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         #A button to do the action of generating the student information report
         generate_student_information_report_button = customtkinter.CTkButton(self, text="Generate Student Information Report", command=lambda: generateStudentInformationReport(information_student_id_entry, student_information_report_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         generate_student_information_report_button.grid(row=49, column=0, columnspan=2, padx=10, pady=10)
+
+        #########################################################################################################################
+
+        #10. Generate a housing status report, lines 314-325
+        #Generate the housing status report heading/title
+        generate_housing_report_title = customtkinter.CTkLabel(self, text="Generate Housing Status Report", font=("Arial", 20, "bold"))
+        generate_housing_report_title.grid(row=50, column=0, columnspan=2, padx=10, pady=20)
+
+        #Label to display the output of the housing status report or if an error occurred
+        housing_report_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        housing_report_result_label.grid(row=51, column=0, columnspan=2, padx=10, pady=10)
+
+        #Button to display the housing status report to the user
+        generate_housing_report_button = customtkinter.CTkButton(self, text="Generate Housing Status Report", command=lambda: generateHousingStatusReport(housing_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        generate_housing_report_button.grid(row=52, column=0, columnspan=2, padx=10, pady=10)
 
 #Sets Up the App appearance
 class App(customtkinter.CTk):
@@ -733,6 +748,53 @@ def generateStudentInformationReport(student_id_entry, result_label):
         result_label.configure(text=report)
 
     #If an error occurs when generating the student information report
+    except mysql.connector.Error as sqlError:
+        #Return the error to the user
+        result_label.configure(text=f"Error: {sqlError}")
+
+    #Finally exit the database
+    finally:
+        cursor.close()
+        db.close()
+
+##################################################################################################################
+
+#10. Function to generate a report on all students housing status
+def generateHousingStatusReport(result_label):
+    #Connect to the database and try to generate the housing status report
+    try:
+        db = connect_to_database()
+        cursor = db.cursor()
+
+        #The SQL to generate the housing status report
+        cursor.execute("""
+            SELECT 
+                s.StudentID, 
+                s.StuFirstName, 
+                s.StuLastName, 
+                s.Year, 
+                h.HousingStatus, 
+                h.Building 
+            FROM studentinformation s 
+            LEFT JOIN housingstatus h ON s.StudentID = h.StudentID 
+            ORDER BY s.StudentID """)
+
+        #Retrieve the information for the housing status report
+        HousingStatus = cursor.fetchall()
+
+        #Constructs the course report to be shown to the user
+        report = "Housing Status Report\n"
+        report += "-" * 50 + "\n"
+
+        #Constructs the housing status report to be shown to the user
+        for housStatus in HousingStatus:
+            student_id, first_name, last_name, year, housing_status, building = housStatus
+            report += f"Student ID: {student_id}, Student Name: {first_name} {last_name}, Year: {year}, Housing Status: {housing_status}, Building: {building}\n"
+        
+        #Returns the final housing report to the user
+        result_label.configure(text=report)
+
+    #If an error occurs when generating the housing status report 
     except mysql.connector.Error as sqlError:
         #Return the error to the user
         result_label.configure(text=f"Error: {sqlError}")
