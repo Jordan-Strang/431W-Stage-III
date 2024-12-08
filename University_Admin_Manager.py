@@ -1,3 +1,5 @@
+#Developed by: Jordan Strang, Javier Strang
+
 import tkinter
 import customtkinter
 import mysql.connector
@@ -85,18 +87,18 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         remove_Course_title.grid(row=10, column=0, columnspan=2, padx=10, pady=20)
 
         #Label for entering the course id
-        course_id_label = customtkinter.CTkLabel(self, text="Enter Course ID to be Removed:", font=("Arial", 12))
-        course_id_label.grid(row=11, column=0, padx=10, pady=5, sticky="w")
+        remove_course_id_label = customtkinter.CTkLabel(self, text="Enter Course ID to be Removed:", font=("Arial", 12))
+        remove_course_id_label.grid(row=11, column=0, padx=10, pady=5, sticky="w")
         #Entry field for entering the course id
-        course_id_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 123450 (6 Digits)", font=("Arial", 12))
-        course_id_entry.grid(row=11, column=1, padx=10, pady=5)
+        remove_course_id_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 123450 (6 Digits)", font=("Arial", 12))
+        remove_course_id_entry.grid(row=11, column=1, padx=10, pady=5)
 
         #Label to display if the removal was successful or a failure (with error)
         remove_Course_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
         remove_Course_result_label.grid(row=12, column=0, columnspan=2, padx=10, pady=10)
 
         #A button to remove the course from the course information
-        remove_Course_button = customtkinter.CTkButton(self, text="Remove Course", command=lambda: removeCourse(course_id_entry, remove_Course_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        remove_Course_button = customtkinter.CTkButton(self, text="Remove Course", command=lambda: removeCourse(remove_course_id_entry, remove_Course_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         remove_Course_button.grid(row=13, column=0, columnspan=2, padx=10, pady=10)
 
         ####################################################################################
@@ -339,6 +341,50 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         generate_financial_report_button = customtkinter.CTkButton(self, text="Generate Students Financial Information Report", command=lambda: generateFinancialInfoReport(financial_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
         generate_financial_report_button.grid(row=52, column=0, columnspan=2, padx=10, pady=10)
 
+        ################################################################################################################################
+
+        #12. Generate a instructor report, lines 344-355
+        #Generate the instructor report heading/title
+        generate_instructor_report_title = customtkinter.CTkLabel(self, text="Generate Instructor Information Report", font=("Arial", 20, "bold"))
+        generate_instructor_report_title.grid(row=53, column=0, columnspan=2, padx=10, pady=20)
+
+        #Label to display the output of the students financial information report or if an error occurred
+        instructor_report_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        instructor_report_result_label.grid(row=54, column=0, columnspan=2, padx=10, pady=10)
+
+        #Button to display the students financial information report to the user
+        generate_instructor_report_button = customtkinter.CTkButton(self, text="Generate Instructor Information Report", command=lambda: generateInstructorReport(instructor_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        generate_instructor_report_button.grid(row=55, column=0, columnspan=2, padx=10, pady=10)
+
+        ####################################################################################################################################
+
+        #13. Enroll a student into one or more courses, lines 359-384
+        #Enroll a student into courses Heading/Title
+        enrollStudent_title = customtkinter.CTkLabel(self, text="Enroll Student in Courses", font=("Arial", 20, "bold"))
+        enrollStudent_title.grid(row=56, column=0, columnspan=2, padx=10, pady=20)
+
+        #Label for entering student id
+        enroll_student_id_label = customtkinter.CTkLabel(self, text="Enter Student ID:", font=("Arial", 12))
+        enroll_student_id_label.grid(row=57, column=0, padx=10, pady=5, sticky="w")
+        #Entry field to enter the student ID
+        enroll_student_id_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 111110 (6 Digits)", font=("Arial", 12))
+        enroll_student_id_entry.grid(row=57, column=1, padx=10, pady=5)
+
+        #Label for entering course IDs
+        enroll_student_course_ids_label = customtkinter.CTkLabel(self, text="Enter Course IDs (Separate with commas):", font=("Arial", 12))
+        enroll_student_course_ids_label.grid(row=58, column=0, padx=10, pady=5, sticky="w")
+        #Entry field to enter the course IDs
+        enroll_student_course_ids_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 123450, 123451 (6 Digit Course ID)", font=("Arial", 12))
+        enroll_student_course_ids_entry.grid(row=58, column=1, padx=10, pady=5)
+
+        #Label to display if the enrollment was succesful or if an error occurred
+        enroll_student_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
+        enroll_student_result_label.grid(row=59, column=0, columnspan=2, padx=10, pady=10)
+
+        #A button to enroll the student into the inputted courses
+        enroll_student_button = customtkinter.CTkButton(self, text="Enroll Student", command=lambda: enrollStudentInCourses(enroll_student_id_entry, enroll_student_course_ids_entry, enroll_student_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
+        enroll_student_button.grid(row=60, column=0, columnspan=2, padx=10, pady=10)
+
 #Sets Up the App appearance
 class App(customtkinter.CTk):
     def __init__(self):
@@ -363,7 +409,7 @@ def addStudent(student_id_entry, first_name_entry, last_name_entry, major_entry,
 
     #Error to handle if one of the entry fields are empty or NULL. All Entry fields must be filled.
     if not student_id or not first_name or not last_name or not major or not year or not gpa:
-        result_label.config(text="All Entry fields are required.")
+        result_label.configure(text="All Entry fields are required.")
         return
 
     #Connect to the database and try to add the student
@@ -401,7 +447,7 @@ def removeCourse(course_id_entry, result_label):
 
     #Error to handle if the course id entry field is empty
     if not course_id:
-        result_label.config(text="Course ID is required.")
+        result_label.configure(text="Course ID is required.")
         return
 
     #Connect to the database and try to remove the course
@@ -426,7 +472,7 @@ def removeCourse(course_id_entry, result_label):
     #If an error occurs when removing the course from the database
     except mysql.connector.Error as sqlError:
         #Return the error to the user
-        result_label.config(text=f"Error: {sqlError}")
+        result_label.configure(text=f"Error: {sqlError}")
 
     #Finally exit the database
     finally:
@@ -447,7 +493,7 @@ def updateStudent(student_id_entry, first_name_entry, last_name_entry, major_ent
 
     #Error to handle if one of the entry fields are empty or NULL. All Entry fields must be filled.
     if not student_id or not first_name or not last_name or not major or not year or not gpa:
-        result_label.config(text="All Entry fields are required.")
+        result_label.configure(text="All Entry fields are required.")
         return
 
     #Connect to the database and try to update the student information
@@ -528,7 +574,7 @@ def removeStudent(student_id_entry, result_label):
 
     #Error to handle if the student id entry field is empty
     if not student_id:
-        result_label.config(text="Student ID is required.")
+        result_label.configure(text="Student ID is required.")
         return
 
     #Connect to the database and try to remove the student
@@ -553,7 +599,7 @@ def removeStudent(student_id_entry, result_label):
     #If an error occurs when removing the student from the database
     except mysql.connector.Error as sqlError:
         #Return the error to the user
-        result_label.config(text=f"Error: {sqlError}")
+        result_label.configure(text=f"Error: {sqlError}")
 
     #Finally exit the database
     finally:
@@ -574,7 +620,7 @@ def addCourse(course_id_entry, course_name_entry, course_code_entry, department_
 
     #Error to handle if one of the entry fields are empty or NULL. All Entry fields must be filled.
     if not course_id or not course_name or not course_code or not department_id:
-        result_label.config(text="All Entry fields are required.")
+        result_label.configure(text="All Entry fields are required.")
         return
 
     #Connect to the database and try to add the course
@@ -648,7 +694,7 @@ def generateEnrolledCourseReport(course_id_entry, result_label):
 
     #Error to handle if one of the entry fields are empty or NULL. All Entry fields must be filled.
     if not course_id:
-        result_label.config(text="Course ID Entry field is required.")
+        result_label.configure(text="Course ID Entry field is required.")
         return
 
     #Connect to the database and try to generate the enrolled course report
@@ -699,7 +745,7 @@ def generateStudentInformationReport(student_id_entry, result_label):
 
     #Error to handle if one of the entry fields are empty or NULL. All Entry fields must be filled.
     if not student_id:
-        result_label.config(text="Student ID Entry field is required.")
+        result_label.configure(text="Student ID Entry field is required.")
         return
 
     #Connect to the database and try to generate the enrolled course report
@@ -857,6 +903,105 @@ def generateFinancialInfoReport(result_label):
         result_label.configure(text=report)
 
     #If an error occurs when generating the students financial information report 
+    except mysql.connector.Error as sqlError:
+        #Return the error to the user
+        result_label.configure(text=f"Error: {sqlError}")
+
+    #Finally exit the database
+    finally:
+        cursor.close()
+        db.close()
+
+#################################################################################################################################
+
+#12. Function to generate a instructor report 
+def generateInstructorReport(result_label):
+    #Connect to the database and try to generate the instructor report
+    try:
+        db = connect_to_database()
+        cursor = db.cursor()
+
+        #The SQL to generate the instructor report
+        cursor.execute("""
+            SELECT 
+                i.InstructorID, 
+                i.InsFirstName, 
+                i.InsLastName, 
+                d.College, 
+                d.Discipline 
+            FROM instructorinformation i 
+            JOIN department d ON i.DepartmentID = d.DepartmentID 
+            ORDER BY i.departmentID """)
+
+        #Retrieve the information for the instructor report
+        Instructor = cursor.fetchall()
+
+        #Constructs the instructor report to be shown to the user
+        report = "Instructor Information Report\n"
+        report += "-" * 50 + "\n"
+
+        #Constructs the instructor report to be shown to the user
+        for Instruct in Instructor:
+            instructor_id, ins_first_name, ins_last_name, college, discipline = Instruct
+            report += f"Instructor ID: {instructor_id}, Instructor Name: {ins_first_name} {ins_last_name}, College: {college}, Discipline: {discipline}\n"
+        
+        #Returns the final instructor report to the user
+        result_label.configure(text=report)
+
+    #If an error occurs when generating the instructor report 
+    except mysql.connector.Error as sqlError:
+        #Return the error to the user
+        result_label.configure(text=f"Error: {sqlError}")
+
+    #Finally exit the database
+    finally:
+        cursor.close()
+        db.close()
+
+#######################################################################################################################################
+
+#13. Enroll a student into one or more courses, rollback if student is already in the course or course does not exist
+def enrollStudentInCourses(student_id_entry, course_ids_entry, result_label):
+    # Retrieve the user inputted information
+    student_id = student_id_entry.get()
+    course_ids_input = course_ids_entry.get()
+
+    # Error to handle if one of the entry fields is empty or NULL
+    if not student_id or not course_ids_input:
+        result_label.configure(text="Student ID and Course IDs entry fields are required.")
+        return
+    
+    # Parse the input of course IDs (comma separated values)
+    try:
+        course_ids = [int(course_id.strip()) for course_id in course_ids_input.split(',')]
+    except ValueError:
+        result_label.configure(text="Invalid Course IDs format. Please use integers separated by commas.")
+        return
+
+    # Connect to the database and try to enroll the student
+    try:
+
+        db = connect_to_database()
+        cursor = db.cursor()
+
+        # SQL transaction block for enrolling the student in multiple courses
+        cursor.execute("START TRANSACTION;")
+
+        # Prepare the values to insert for all course enrollments
+        enrollment = [(student_id, course_id) for course_id in course_ids]
+
+        # Insert the student enrollments
+        cursor.executemany("""
+            INSERT INTO studentenrollment (StudentID, CourseID)
+            VALUES (%s, %s) """, enrollment)
+
+        # Commit the transaction if no errors occur
+        db.commit()
+
+        # Return a success message with all the enrolled courses
+        result_label.configure(text=f"Student with Student ID: {student_id} has been enrolled in courses: {', '.join(map(str, course_ids))}.")
+    
+    #If an error occurs when enrolling the student in courses
     except mysql.connector.Error as sqlError:
         #Return the error to the user
         result_label.configure(text=f"Error: {sqlError}")
