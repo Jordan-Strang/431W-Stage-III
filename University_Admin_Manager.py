@@ -3,16 +3,20 @@
 import tkinter
 import customtkinter
 import mysql.connector
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 #Connect to the locally hosted database
 def connect_to_database():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Jordan&Javier!!",
-        port="3306",
+        host=os.getenv("dbHost"),
+        user=os.getenv("dbUser"),
+        password=os.getenv("dbPassword"),
+        port=os.getenv("dbPort"),
         auth_plugin="mysql_native_password",
-        database="431wproject"
+        database=os.getenv("dbName")
     )
 
 #App Appeareance
@@ -550,7 +554,7 @@ def generateGPAReport(result_label):
         report = "GPA Report Sorted by Highest to Lowest\n"
         report += "-" * 50 + "\n"
         for student in students:
-            report += f"ID: {student[0]}, Name: {student[1]} {student[2]}, Major: {student[3]}, Year: {student[4]}, GPA: {student[5]}\n"
+            report += f"Student ID: {student[0]}, Student Name: {student[1]} {student[2]}, Major: {student[3]}, Year: {student[4]}, GPA: {student[5]}\n"
 
         #Returns the final GPA report to the user
         result_label.configure(text=report)
