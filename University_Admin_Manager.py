@@ -335,59 +335,59 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         #11. Generate a students financial information report, lines 329-340
         #Generate the students financial information report heading/title
         generate_financial_report_title = customtkinter.CTkLabel(self, text="Generate Students Financial Information Report", font=("Arial", 20, "bold"))
-        generate_financial_report_title.grid(row=50, column=0, columnspan=2, padx=10, pady=20)
+        generate_financial_report_title.grid(row=53, column=0, columnspan=2, padx=10, pady=20)
 
         #Label to display the output of the students financial information report or if an error occurred
         financial_report_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
-        financial_report_result_label.grid(row=51, column=0, columnspan=2, padx=10, pady=10)
+        financial_report_result_label.grid(row=54, column=0, columnspan=2, padx=10, pady=10)
 
         #Button to display the students financial information report to the user
         generate_financial_report_button = customtkinter.CTkButton(self, text="Generate Students Financial Information Report", command=lambda: generateFinancialInfoReport(financial_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
-        generate_financial_report_button.grid(row=52, column=0, columnspan=2, padx=10, pady=10)
+        generate_financial_report_button.grid(row=55, column=0, columnspan=2, padx=10, pady=10)
 
         ################################################################################################################################
 
         #12. Generate a instructor report, lines 344-355
         #Generate the instructor report heading/title
         generate_instructor_report_title = customtkinter.CTkLabel(self, text="Generate Instructor Information Report", font=("Arial", 20, "bold"))
-        generate_instructor_report_title.grid(row=53, column=0, columnspan=2, padx=10, pady=20)
+        generate_instructor_report_title.grid(row=56, column=0, columnspan=2, padx=10, pady=20)
 
         #Label to display the output of the students financial information report or if an error occurred
         instructor_report_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
-        instructor_report_result_label.grid(row=54, column=0, columnspan=2, padx=10, pady=10)
+        instructor_report_result_label.grid(row=57, column=0, columnspan=2, padx=10, pady=10)
 
         #Button to display the students financial information report to the user
         generate_instructor_report_button = customtkinter.CTkButton(self, text="Generate Instructor Information Report", command=lambda: generateInstructorReport(instructor_report_result_label),font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
-        generate_instructor_report_button.grid(row=55, column=0, columnspan=2, padx=10, pady=10)
+        generate_instructor_report_button.grid(row=58, column=0, columnspan=2, padx=10, pady=10)
 
         ####################################################################################################################################
 
         #13. Enroll a student into one or more courses, lines 359-384
         #Enroll a student into courses Heading/Title
         enrollStudent_title = customtkinter.CTkLabel(self, text="Enroll Student in Courses", font=("Arial", 20, "bold"))
-        enrollStudent_title.grid(row=56, column=0, columnspan=2, padx=10, pady=20)
+        enrollStudent_title.grid(row=59, column=0, columnspan=2, padx=10, pady=20)
 
         #Label for entering student id
         enroll_student_id_label = customtkinter.CTkLabel(self, text="Enter Student ID:", font=("Arial", 12))
-        enroll_student_id_label.grid(row=57, column=0, padx=10, pady=5, sticky="w")
+        enroll_student_id_label.grid(row=60, column=0, padx=10, pady=5, sticky="w")
         #Entry field to enter the student ID
         enroll_student_id_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 111110 (6 Digits)", font=("Arial", 12))
-        enroll_student_id_entry.grid(row=57, column=1, padx=10, pady=5)
+        enroll_student_id_entry.grid(row=60, column=1, padx=10, pady=5)
 
         #Label for entering course IDs
         enroll_student_course_ids_label = customtkinter.CTkLabel(self, text="Enter Course IDs (Separate with commas):", font=("Arial", 12))
-        enroll_student_course_ids_label.grid(row=58, column=0, padx=10, pady=5, sticky="w")
+        enroll_student_course_ids_label.grid(row=61, column=0, padx=10, pady=5, sticky="w")
         #Entry field to enter the course IDs
         enroll_student_course_ids_entry = customtkinter.CTkEntry(self, placeholder_text="e.g 123450, 123451 (6 Digit Course ID)", font=("Arial", 12))
-        enroll_student_course_ids_entry.grid(row=58, column=1, padx=10, pady=5)
+        enroll_student_course_ids_entry.grid(row=61, column=1, padx=10, pady=5)
 
         #Label to display if the enrollment was succesful or if an error occurred
         enroll_student_result_label = customtkinter.CTkLabel(self, text="", font=("Arial", 12, "italic"))
-        enroll_student_result_label.grid(row=59, column=0, columnspan=2, padx=10, pady=10)
+        enroll_student_result_label.grid(row=62, column=0, columnspan=2, padx=10, pady=10)
 
         #A button to enroll the student into the inputted courses
         enroll_student_button = customtkinter.CTkButton(self, text="Enroll Student", command=lambda: enrollStudentInCourses(enroll_student_id_entry, enroll_student_course_ids_entry, enroll_student_result_label), font=("Arial", 12, "bold"), corner_radius=8, hover_color="lightblue")
-        enroll_student_button.grid(row=60, column=0, columnspan=2, padx=10, pady=10)
+        enroll_student_button.grid(row=63, column=0, columnspan=2, padx=10, pady=10)
 
 #Sets Up the App appearance
 class App(customtkinter.CTk):
