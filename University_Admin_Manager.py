@@ -520,7 +520,7 @@ def updateStudent(student_id_entry, first_name_entry, last_name_entry, major_ent
         
         #Return that the student information has been updated
         else:
-            result_label.configure(text=f"{first_name} {last_name} with Student ID: {student_id} has been updated.")
+            result_label.configure(text=f"Student: {first_name} {last_name} with Student ID: {student_id} has been updated.")
     
     #If an error occurs when updating student information
     except mysql.connector.Error as sqlError:
@@ -1003,7 +1003,7 @@ def enrollStudentInCourses(student_id_entry, course_ids_entry, result_label):
         db.commit()
 
         # Return a success message with all the enrolled courses
-        result_label.configure(text=f"Student with Student ID: {student_id} has been enrolled in courses: {', '.join(map(str, course_ids))}.")
+        result_label.configure(text=f"Student with Student ID: {student_id} has been enrolled in course IDs: {', '.join(map(str, course_ids))}.")
     
     #If an error occurs when enrolling the student in courses
     except mysql.connector.Error as sqlError:
